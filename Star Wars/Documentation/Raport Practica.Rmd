@@ -1,0 +1,219 @@
+---
+title: "Practice Project"
+author: "Vlad Aluas"
+date: "`r format(Sys.time(), '%d.%b.%Y')`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, collapse = TRUE, comment = "#>")
+```
+
+
+<br> 
+
+# Introduction
+
+### The scope of the project
+  
+This project is designed to show one of the most useful and time saving tools I use as a Data Scientist / Data Analyst and to be a documentation of one of the time saving processes used quite a lot by my colleagues and I. This tool is **R Markdown**, a tool included in the **R Studio** IDE. I find it as a time saver due to the fact that it allows me to create automated reports with in depth comments and trace my steps with ease.
+
+### How does the tool work?
+
+The tool allows you to integrate text with code in order to document your process, or explain assumption for your analysis and show the results.  
+The tool also provides the ability to hide or not the code used in your reporting, due to the fact that most business users will not be interested in the code you use, they will most likely be interested just in the results. This is quite a time saver because it facilitates the use of the same document to refresh the results and graphics with just a simple re-run once the database used initially has been updated or changed, without having to format the presentation every time, or do manually update each graphic.
+
+### Assumptions
+  
+In this presentation I will show the steps I usually take in order to create an automated presentation, however this being a meta-presentation will be meant as a guiding document, not an actual automated report. The two main differences would be the following: 
+
+  *  In this document I will show the code I am using, so everyone can reproduce my steps in **R**
+  *  In a report I would mostly focus on the *what?*, while in this particular document I would try to focus more on *how?* and *why?*
+  
+### Data sets
+  
+For this project we will use some data sets provided by the *Gapminder* foundation. They have extensive databases on a series of variables across a long time spam.
+
+# Setup
+  
+In this section we will discuss the setup needed for you to be able to follow the code. I would like to mention that this section is not usually included in the final document(*i.e.* the one seen by the business user) since there is no written part for this.  
+Here we will set up the code we need and I will give some examples of transformation that can be done in this part so it will be easier when we will visualise and summarise the data.  
+This part usually is replaced by an introduction in which we usually specify the business setup, the business needs and the assumptions for the analysis going forward. Since that part is usually just text and very case specific we will replace it with the code setup part.  
+In this part I would also like to discuss a good practice particularly that is common in the industry and will save you a lot of head each. When starting an analysis, in **R Markdown** or **R Studio**, first import your libraries, all of them in the same place in the script, then you data sets, again all of them in the same place in the script, afterwards you can start transforming the data. This is not essential, however I will save you a lot of time when you want to find a data set and change it's source or change a library.  
+As you will see below my steps are the following:
+
+ 1. Activating the libraries
+ 2. Importing the data sets
+ 3. Transforming the data
+
+### Libraries
+
+In order to import and process the data for our analysis, we will need some specialised libraries that need to be installed on you computer, or activated if you already have them installed. In order to activate the libraries, you will need to code below:
+
+```{r libraries}
+# If you do not have these libraries already installed, you can install them by using the code below
+# Remember to delete the # before the code
+
+# install.packages("tidyverse")
+# install.packages("gganimate")
+# install.packages("gapminder")
+
+library(tidyverse) # used for main data tranformations
+library(gganimate) # used so we can animate the graphs
+library(gapminder) # used for its data sets
+```
+
+### Data sets  
+
+Once we have installed and activated the libraries we can import the data and start the transformation process that will allow us to visualise the data.  
+Usually you will have multiple data sets from a variety of sources, or just one source, depending on the analysis. For the scope of this paper we will use only one data set as this is intended as an example of concept, not an extensive report.  
+The data set used for this will be the **gapminder** database from the library with the same name. Due to the fact that we usually import data, we will store this database in a different object, named **data**.
+
+```{r datasets}
+data <- gapminder
+```
+
+### Transformation
+
+Since the data set that we use is in a format that is easily usable in a graphic, we do not need to transform it. However, I would like to exemplify some of the capabilities of this software so you can have a better idea of what are his capabilities and also what you could find useful as data transformation.  
+First, let us check the data we are using at the moment.
+
+```{r table exploration}
+head(data)
+```
+
+As we can see there are 6 columns in the data set, *country*, *continent*, *year*, *lifeExp*, *pop*, *gdpPercap*. One of the first things that we notice here is that each country has multiple observations for the named variables, each observation belonging to one year. The first thing we might want to do is to keep just the latest record for each country in order to see the current status. We can do that by grouping the data by country and filtering for the highest year.  
+Please check the code below:
+
+```{r filter}
+data %>%
+  group_by(country) %>%
+  filter(year == max(year))
+```
+
+Maybe we would like to actually have a different metric summarised, let's say we would like to have the maximum GDP Per Capita and maximum population for each country disregarding the year.  
+We can do so by using the code below:
+```{r summarisation}
+data %>%
+  group_by(country) %>%
+  summarise(Max_GDP = max(gdpPercap),
+            Max_Pop = max(pop))
+```
+
+We can do all sorts of transformations in this section, depending on the business needs and the format of the data we are using. For more information on how to transform and manipulate the data, I would suggest checking *Garrett Grolemund* and *Hadley Wickham's* excellent book [R for Data Science](https://r4ds.had.co.nz/index.html).
+
+Now, after the transforming the data in the desired format, we can proceed to showing the results visually. We will do so in next section.
+
+# Visualising the data
+
+Please keep in mind that all the data preparations we did so far were in the background, the person reading the document did not see the result of any of our code lines so far. From here on we will be able to show the results in a more visual way. Let us begin with some graphs. We might add some introduction to each graph, however this should have been covered by an introductory section, although we chose to skip that and replace it with a section on data transformation.
+  
+In the next section we will discuss some good practises when it comes to coding and when creating graphics. 
+  
+In a lot of business environments you will need to adopt a standard format of reporting. This is all good if you already have a single graphic to do and you can just spend your time adjusting it. What happens if you have more than one graphic? You can just copy and paste the relevant parts, right? Yes you can, however what happens if at one time you will need to adjust the template? Will you go on every graphic and adjust the settings? No, this is too time consuming, and **R** provides two elegant solutions for this.
+
+ 1. You can set the theme of the plots you are displaying to show the colour scheme and proprieties you would like. Once you've done this, all the graphics will have the same proprieties. You can find more on this topic in *Hadley Wickham's* book [ggplot2 - Elegant graphics for data analysis](http://moderngraphics11.pbworks.com/f/ggplot2-Book09hWickham.pdf)
+
+ 2. You can store your basic plot in an object and add layers to the graphic according to reporting needs. This is the way I usually do and it works fine. If you need to change anything in your plot, you can just change the original object once
+  
+This approach is important due to the fact that you would like to avoid repeatedly writing the same code over and over again and forget to make a change in one place by simply overlooking that chunk of code.
+
+For the rest of this part, I will use the second approach and show how you can present increasingly more complex graphics that will allow business executives make a decision.
+
+First of all I like to start with the current status of the business. For that we will create a plot object (plot_vlad) that will contain all the data that we want to include in the visuals and we will slice it and analyse it afterwards.
+
+```{r storing the original plot}
+plot_vlad <- data %>%
+                ggplot(aes(gdpPercap, lifeExp, size = pop, colour = continent)) +
+                    geom_point(alpha = 0.4, show.legend = FALSE) +
+                    scale_colour_manual(values = continent_colors) +
+                    scale_size(range = c(2, 12)) +
+                    scale_x_log10()
+```
+
+This piece of code allows me to store all the most important parts of the graph into one object called `plot_vlad`. Now we can access this plot and all its configurations by simply typing the name. You can see that in the code below:
+
+```{r viewing the original plot}
+plot_vlad
+```
+
+As we can see, it does not give us a lot of information on the state of the business since it contains all the data points and it contains a lot of noise. We cannot tell which is the latest data point. We will add some more elements to the data to make it easier to read and see what we can add to it so we can extract as much business information as possible. We would only like to show the last year in record for each country. In order to do so, we will need to filter the data out. For that we can simply group the information by country use the `filter` function to show the latest year for each country
+  
+We will also add some aesthetic elements to the plot to make it easier to read. You can see the purpose of each line of code after the # symbol.
+
+```{r filtering the data to show the last year}
+# It would be better to create a separate plot with the data already filtered in order to avoid writing the code every time
+plot_filtered <- plot_vlad %+%  # Original plot
+                    group_by(data, country) %+% # creating subgroups for each country so the filter could take the max year for each country, not the max year
+                    filter(data, year == max(year)) # Including just the maximum year for each country
+
+# Showing the plot
+plot_filtered +
+  labs(x = 'GDP Per Capita', y = 'Life Expectancy') # Making the axis easier to read
+```
+
+Now we can see the data more clearly and we can have a general image of where the countries stand. Actually, we cannot from this graph specifically due to the lack of legend, however, since we have the data coloured according to continent, I believe we can see some patterns in the continents themselves, and even without a legend, we can guess which continent is which.
+
+I would still like to see the data separated and grouped as to show just one continent in a graph. From a business perspective, we can see the importance of this, we have different regions that have different levels of development and we would like to see them compared to their piers, not with other more or less developed regions.
+
+In order to do so, we have two options:  
+
+ * We recreate the graphic above with an additional filter for each region, continent in this case
+ * We show all the continents in the same dashboard and a separate graph for each continent in order to be easier to compare.
+
+Since the first option is easy to implement, we will focus on the second option. This is done using a `wrap` function of **R**, in this particular case we will use `facet_wrap()`: 
+
+```{r slicing the data by continent}
+plot_filtered + # the plot we want to show with the last record for each country
+  labs(x = 'GDP Per Capita', y = 'Life Expectancy') + # Making the axis easier to read
+  facet_wrap( ~ continent) # spliting the graphics by continent
+```
+
+Now we can compare the continents to each other. *Europe* and *The Americas* have the highest life expectancy and and the highest GDP per Capita, while Africa has the lowest. *Oceania* also has high GDP per Capita and high life expectancy, however the number of countries is small, two, `r {data %>% filter(continent == "Oceania") %>% select(country) %>% distinct() %>% slice(1)}` and `r {data %>% filter(continent == "Oceania") %>% select(country) %>% distinct() %>% slice(2)}` and both are closer to *Europe* traditionally than *Oceania*.
+  
+Now that we have all this information sliced up and we can compare continents, Wouldn't it be nice if we could see how from where they started? In order to do so, we can add a new layer to the graph, and that would be to animate the data. In order to do so, we will use the `gganimate` library.
+
+```{r adding an aniomation to show the evolution}
+plot_vlad +
+     facet_wrap(~continent) +
+#    # Here comes the gganimate specific bits
+     labs(title = 'Year: {frame_time}', x = 'GDP Per Capita', y = 'Life Expectancy') +
+     transition_time(year) +
+     ease_aes('linear')
+```
+
+Now we can see the data and the evolution of the relationship between **Life Expectancy** and **GDP Per Capita** in different continents in the last half of the 20$^{th}$ century. In a business setting, we can see how this type of graphic can assist a business leader take a decision, especially assisted by business specific knowledge (*e.g.* A particular event happening at a specific point in time can be reflected in the graphic as a serious deviation from the pattern).
+
+# In-line code
+
+I would also like to present one of the most useful parts of this tool. Since there is not much to say, I will keep it brief.
+
+This tools also assist us in creating some summaries for business leaders by allowing us to embed code into our text. This cannot be shown in the final *html* file, only in the *.rmd* document that I will provide with this paper. As a convention, whenever I will use in-line code, I will add in brackets afterwards the line in the document where you can find the code, so you can check it. I have previously used this function twice (I was too lazy to look it up in the data frame) when extracting the name of the two countries from Oceania [204].
+
+This kind of feature is very useful when trying to summarise data that can change alot from one iteration from another. In the data that we have, the latest year is `r {data %>% select(year) %>% filter(year == max(year)) %>% distinct()}` [223] and the country with the highest life expectancy is `r {data %>%  filter(year == max(year) & lifeExp == max(lifeExp)) %>% select(country) %>% distinct()}`[223].
+
+For integrating code lines in the text, it would be prefferable to keep them to short summaries, not anything too complicated, however it can be a very powerful tool once you master it and will allow you to add some template summarisations that can extract the details of the data in just a few short phases.
+
+# Conclusion
+
+**R Markdown** is one of the tools that are not as used in a business setting as they should be. I cannot say how used is in the academic community, as I have not checked the data, however I am assuming that similarly to the business side, not as used as it could be.  
+
+In a business setting, at least from my experience, it is not used, people preferring *Microsoft PowerPoint* if they have to present graphics and explain them, or present a written summary. This approach serves it's purpose, however you have to use different tool to actually create the graphics and then compare them manually to find the conclusions. You will also need to either keep active links to the graphs in your presentation, that can create problems, or you will need to update each graph manually. This way resolves the issue as you just need to update your database and re-run the script once again and everything will work just fine.  
+
+I would like to mention that I know that people do not use only *Microsoft PowerPoint* for these kind of presentation, however this was taken as an example of the advantages of using this tool compared to the traditional presentation tools on the market.  
+
+However, I would also like to point out some disadvantages, compared to other presentation tools. This is not a *Business Intelligence* tools, therefore you will not be able to link it to an online database and have it updated in real time, for that there is the [Shiny Web App](https://shiny.rstudio.com/) developed by **RStudio**. I do not have a lot of experience with it, therefore I cannot provide more information on it. You can also use different tools as there are countless tools besides the two major ones [Tableau](https://www.tableau.com/) or [Power BI](https://powerbi.microsoft.com/en-us/desktop/).  
+
+One other disadvantage is the fact that you cannot make the text change, or you can however it is more trouble than it is worth. You can have some standard parameters discussed before hand and you can add them in the code, however, this tool will not search for the insides in you analysis as a human would. It might if you are a gifted programmer, or you adapt it after countless sessions of feedback.
+  
+I would like to mention that I chose to focus my practice project on this due to the fact that in my every day job this is one of the main concerns that I have to deal with, repetitive reports that take a lot of time. By taking some time to automate these reports, I save time that I can then invest in acquiring different skills, or focus on a different task. Also, if my colleague or I are not available or in the office, the other one can easily generate the report and send it to the business leader that needs it.
+  
+You can also edit almost everything about the report you are generating by adding a *.css* file to it, however, I did not have to do it, so I do not know exactly how to do it, however you can find everything you need to know about `R Markdown` at this [link](https://bookdown.org/yihui/rmarkdown/).
+  
+I would like to conclude this section with an invitation to check the tool, check different online sources for it and see how people use it in extremely creative ways.
+
+# Acknowledgements
+
+The data sets and the code are not produced by myself, the data set comes from the `gapminder` library and is updated and maintained by the *Gapminder* foundation.  
+The code is taken from the developers of the [gganimate package](https://gganimate.com/) and it was only used to illustrate the concept of how we can combine code and text in order to produce automated reports.
+

@@ -1,0 +1,26 @@
+---
+title: "Star Wars"
+author: "Vlad Aluas"
+date: "10/9/2019"
+output: html_document
+---
+
+```{r setup, include = FALSE, collapse = TRUE, comment = "#>"}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(kableExtra)
+```
+
+# Introduction
+
+<br>
+
+In this article we will explore some data from the **Star Wars** franchise. We will check the some interesting data about the caracters in the franchise and we will compare the three series, the **Prequels** (I know BOOO!!!!), the **Original Trilogy** and the **Sequels**. In order to do so, we will use an existing dataset from `R`, the `starwars` data frame. We can see the data frame below:
+
+```{r}
+starwars %>%
+  kable(format = "html") %>%
+  kable_styling(full_width = T, bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+```
+
